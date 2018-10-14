@@ -1,21 +1,18 @@
 ﻿namespace FillGrid
 {
-    public enum CellState
-    {
-        NotSet = 0,
-        Dead = 1,
-        Destroyed = 2,
-        Created = 3,
-        Alive = 4
-    }
+    using System;
 
-    public class Cell
+    public class Cell : ICell
     {
         public CellState State { get; set; }
 
         public CellState TempState { get; set; }
 
-        public Cell[] Neighbors { get; set; }
+        public Func<int> LiveNeighborCount { get; set; }
+
+        public int X { get; set; }
+
+        public int Y { get; set; }
 
         public void FlipStates()
         {

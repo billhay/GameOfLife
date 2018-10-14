@@ -25,21 +25,21 @@
             new Dictionary<CellState, Brush>
             {
                 {CellState.Dead, BrushDead},
+                {CellState.Destroyed, BrushDestroyed},
+                {CellState.Alive, BrushAlive},
+                {CellState.Created, BrushCreated}
+            };        
+        
+        private static readonly Dictionary<CellState, Brush> Dict2 =
+            new Dictionary<CellState, Brush>
+            {
+                {CellState.Dead, BrushDead},
                 {CellState.Destroyed, BrushDead},
                 {CellState.Alive, BrushAlive},
                 {CellState.Created, BrushAlive}
             };
 
-        private static readonly Dictionary<CellState, Brush> Dict2 =
-            new Dictionary<CellState, Brush>
-            {
-                {CellState.Dead, BrushDead},
-                {CellState.Destroyed, BrushDestroyed},
-                {CellState.Alive, BrushAlive},
-                {CellState.Created, BrushCreated}
-            };
-
-        private readonly FoldedGrid grid;
+        private readonly IFoldedGrid grid;
 
         private readonly Rectangle[,] rectangles;
         private readonly DispatcherTimer timer = new DispatcherTimer();
@@ -52,24 +52,26 @@
         {
             this.InitializeComponent();
 
-            this.xMax = (int) this.myCanvas.Width;
-            this.yMax = (int) this.myCanvas.Height;
-            this.xMax = this.xMax / CellSize;
-            this.yMax = this.yMax / CellSize;
-            this.myCanvas.Width = CellSize * this.xMax;
-            this.myCanvas.Height = CellSize * this.yMax;
-            this.rectangles = new Rectangle[this.xMax, this.yMax];
             this.Stop.IsEnabled = false;
             this.timer.IsEnabled = false;
             this.timer.Interval = TimeSpan.FromSeconds(0.1);
             this.timer.Tick += this.OnTimer;
+
+            this.xMax = ((int) this.myCanvas.Width) / CellSize;
+            this.yMax = ((int) this.myCanvas.Height) / CellSize;
+
+            this.myCanvas.Width = CellSize * this.xMax;
+            this.myCanvas.Height = CellSize * this.yMax;
+
             this.grid = new FoldedGrid(this.xMax, this.yMax);
 
+
+            this.rectangles = new Rectangle[this.xMax, this.yMax];
             this.ForEach((x, y) =>
             {
                 Rectangle r = new Rectangle
                 {
-                    Tag = this.grid,
+                    Tag = this.grid[x ,y],
                     Width = CellSize,
                     Height = CellSize,
                     Fill = BrushDead
@@ -88,16 +90,16 @@
             if (this.Iterate.IsEnabled)
             {
                 Rectangle r = (Rectangle) sender;
-                (int x, int y) = (ValueTuple<int, int>) r.Tag;
+                Cell cell = (Cell) r.Tag;
 
-                if (this.grid[x, y] == CellState.Dead)
+                if (cell.State == CellState.Dead)
                 {
-                    this.grid[x, y] = CellState.Created;
+                    cell.State = CellState.Created;
                     r.Fill = this.GetBrush(CellState.Created);
                 }
                 else
                 {
-                    this.grid[x, y] = CellState.Dead;
+                    cell.State = CellState.Dead;
                     r.Fill = this.GetBrush(CellState.Dead);
                 }
             }
@@ -119,7 +121,11 @@
         private void NextIteration()
         {
             this.grid.Iterate();
-            this.ForEach((x, y) => { this.rectangles[x, y].Fill = this.GetBrush(this.grid[x, y]); });
+            this.ForEach((x, y) =>
+            {
+                Rectangle rectangle = this.rectangles[x, y];
+                rectangle.Fill = this.GetBrush(((ICell)rectangle.Tag).State);
+            });
         }
 
         private void Run_Click(object sender, RoutedEventArgs e)
@@ -144,7 +150,7 @@
 
         private Brush GetBrush(CellState state)
         {
-            Dictionary<CellState, Brush> dict = this.showCreateAndDestroy ? Dict2 : Dict1;
+            Dictionary<CellState, Brush> dict = this.showCreateAndDestroy ? Dict1 : Dict2;
             return dict[state];
         }
 
@@ -160,7 +166,7 @@
 
         private void Clear_Click(object sender, RoutedEventArgs e)
         {
-            this.grid.Clear();
+            this.grid.Reset();
             this.ForEach((x,y) => this.rectangles[x, y].Fill = BrushDead);
         }
 
