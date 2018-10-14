@@ -24,19 +24,19 @@
         private static readonly Dictionary<CellState, Brush> Dict1 =
             new Dictionary<CellState, Brush>
             {
-                {CellState.Dead, BrushDead},
-                {CellState.Destroyed, BrushDestroyed},
-                {CellState.Alive, BrushAlive},
-                {CellState.Created, BrushCreated}
+                { CellState.Dead, BrushDead },
+                { CellState.Destroyed, BrushDestroyed },
+                { CellState.Alive, BrushAlive },
+                { CellState.Created, BrushCreated }
             };        
         
         private static readonly Dictionary<CellState, Brush> Dict2 =
             new Dictionary<CellState, Brush>
             {
-                {CellState.Dead, BrushDead},
-                {CellState.Destroyed, BrushDead},
-                {CellState.Alive, BrushAlive},
-                {CellState.Created, BrushAlive}
+                { CellState.Dead, BrushDead },
+                { CellState.Destroyed, BrushDead },
+                { CellState.Alive, BrushAlive },
+                { CellState.Created, BrushAlive }
             };
 
         private readonly IFoldedGrid grid;
@@ -57,21 +57,20 @@
             this.timer.Interval = TimeSpan.FromSeconds(0.1);
             this.timer.Tick += this.OnTimer;
 
-            this.xMax = ((int) this.myCanvas.Width) / CellSize;
-            this.yMax = ((int) this.myCanvas.Height) / CellSize;
+            this.xMax = ((int)this.myCanvas.Width) / CellSize;
+            this.yMax = ((int)this.myCanvas.Height) / CellSize;
 
             this.myCanvas.Width = CellSize * this.xMax;
             this.myCanvas.Height = CellSize * this.yMax;
 
             this.grid = new FoldedGrid(this.xMax, this.yMax);
 
-
             this.rectangles = new Rectangle[this.xMax, this.yMax];
             this.ForEach((x, y) =>
             {
                 Rectangle r = new Rectangle
                 {
-                    Tag = this.grid[x ,y],
+                    Tag = this.grid[x, y],
                     Width = CellSize,
                     Height = CellSize,
                     Fill = BrushDead
@@ -89,8 +88,8 @@
         {
             if (this.Iterate.IsEnabled)
             {
-                Rectangle r = (Rectangle) sender;
-                Cell cell = (Cell) r.Tag;
+                Rectangle r = (Rectangle)sender;
+                Cell cell = (Cell)r.Tag;
 
                 if (cell.State == CellState.Dead)
                 {
@@ -109,7 +108,7 @@
         {
             this.timer.Stop();
             this.NextIteration();
-            this.timer.Interval = TimeSpan.FromMilliseconds(1000 - 90 * this.Speed.Value);
+            this.timer.Interval = TimeSpan.FromMilliseconds(1000 - (90 * this.Speed.Value));
             this.timer.Start();
         }
 
@@ -167,7 +166,7 @@
         private void Clear_Click(object sender, RoutedEventArgs e)
         {
             this.grid.Reset();
-            this.ForEach((x,y) => this.rectangles[x, y].Fill = BrushDead);
+            this.ForEach((x, y) => this.rectangles[x, y].Fill = BrushDead);
         }
 
         private void ForEach(Action<int, int> action)
