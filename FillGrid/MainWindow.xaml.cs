@@ -69,14 +69,11 @@
             {
                 Rectangle r = new Rectangle
                 {
-                    Tag = (x, y),
+                    Tag = this.grid,
                     Width = CellSize,
                     Height = CellSize,
                     Fill = BrushDead
                 };
-
-                var foo = r.Tag;
-                var baz = foo as Tuple<int, int>;
 
                 r.MouseLeftButtonDown += this.OnSelectInitialCell;
                 Canvas.SetTop(r, CellSize * y);
