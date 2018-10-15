@@ -1,4 +1,10 @@
-﻿namespace FillGrid
+﻿//-----------------------------------------------------------------------
+// <copyright file="MainWindow.xaml.cs" company="Bill">
+//     Copyright (C) 2014 Bill Hay  All rights reserved.
+// </copyright>
+// <summary>The ICell interface</summary>
+//-----------------------------------------------------------------------
+namespace FillGrid
 {
     using System;
     using System.Collections.Generic;
@@ -48,6 +54,9 @@
 
         private bool showCreateAndDestroy;
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MainWindow" /> class
+        /// </summary>
         public MainWindow()
         {
             this.InitializeComponent();
@@ -120,9 +129,7 @@
         private void NextIteration()
         {
             this.grid.Iterate();
-            this.ForEach((x, y) =>
-            {
-                Rectangle rectangle = this.rectangles[x, y];
+            this.ForEach((rectangle) => {
                 rectangle.Fill = this.GetBrush(((ICell)rectangle.Tag).State);
             });
         }
@@ -166,7 +173,7 @@
         private void Clear_Click(object sender, RoutedEventArgs e)
         {
             this.grid.Reset();
-            this.ForEach((x, y) => this.rectangles[x, y].Fill = BrushDead);
+            this.ForEach((r) => r.Fill = BrushDead);
         }
 
         private void ForEach(Action<int, int> action)
@@ -177,6 +184,14 @@
                 {
                     action(x, y);
                 }
+            }
+        }
+
+        private void ForEach(Action<Rectangle> action)
+        {
+            foreach (var rectangle in this.rectangles)
+            {
+                action(rectangle);
             }
         }
     }
